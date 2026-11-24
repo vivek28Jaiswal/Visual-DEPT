@@ -189,7 +189,6 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
 
   const handlePosterClick = (projectIdx) => {
     setActiveProjectIndex(projectIdx)
-    if (onToggleView) onToggleView(false)
   }
 
   // Active project change callback from 3D cloth canvas (strictly disabled during index view)
@@ -264,17 +263,37 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
         />
       </div>
 
-      {/* 2. Index View Mode (matching user reference screenshot media_1795447331044_178c8656.jpg) */}
+      {/* 2. Index View Mode (matching user reference screenshot media_1795502178295_17af06c6.jpg on mobile & media_1795447331044_178c8656.jpg on desktop) */}
       <div
-        className={`absolute inset-0 z-30 flex bg-[#F0F0F0] transition-opacity duration-500 pt-[88px] sm:pt-32 md:pt-36 pb-[32px] px-[20px] sm:px-7 md:px-8 ${
+        className={`absolute inset-0 z-30 flex flex-col bg-[#F0F0F0] transition-opacity duration-500 pt-[70px] md:pt-28 lg:pt-32 pb-0 px-[20px] sm:px-7 md:px-8 ${
           isGridView ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <div className="w-full h-full flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-8">
-          {/* Left Side: 4-Column Poster Grid (Silky Lenis Inertia Scroll, without any visible scrollbar) */}
+        {/* Mobile Fixed Top Editorial Content (lg:hidden) - with exact 20px top and 20px bottom spacing */}
+        <div className="block lg:hidden shrink-0 pt-[20px] pb-[20px] text-left select-none">
+          <h1 className="text-[32px] sm:text-[38px] font-thebold font-bold text-black uppercase leading-[0.96] tracking-tight m-0 p-0 pt-1 pb-1 no-underline border-none decoration-transparent transition-all duration-300">
+            {splitWordsEvery2(project.title).map((line, idx) => (
+              <span key={idx} className="block leading-[0.96] no-underline border-none decoration-transparent">
+                {line}
+              </span>
+            ))}
+          </h1>
+
+          <p className="font-neue text-[13px] sm:text-[14px] leading-[1.38] text-black font-normal mt-2.5 max-w-[480px] tracking-tight transition-all duration-300">
+            {project.description}
+          </p>
+
+          <p className="font-neue text-[11px] font-medium tracking-[0.06em] text-black uppercase mt-2.5 transition-all duration-300">
+            {project.tags}
+          </p>
+        </div>
+
+        {/* Main Content Area: Split-Screen on Desktop, Scrollable Grid on Mobile */}
+        <div className="w-full flex-1 min-h-0 flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-8">
+          {/* Scrollable Poster Grid (4-cols on desktop, 2-cols on mobile) */}
           <div
             ref={gridScrollRef}
-            className="w-full lg:w-[68%] xl:w-[70%] h-full overflow-y-auto no-scrollbar pt-2 pr-1 sm:pr-2 pb-20 lg:pb-28 select-none"
+            className="w-full lg:w-[68%] xl:w-[70%] h-full overflow-y-auto no-scrollbar pt-2 pr-1 sm:pr-2 pb-[32px] lg:pb-28 select-none"
           >
             <div
               ref={gridContentRef}
@@ -285,8 +304,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
                   key={idx}
                   onClick={() => handlePosterClick(poster.projectIdx)}
                   onMouseEnter={() => handlePosterHover(poster.projectIdx)}
-                  onMouseMove={() => handlePosterHover(poster.projectIdx)}
-                  className="relative aspect-[3/4] w-full overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  className="relative aspect-[3/4] w-full overflow-hidden cursor-pointer group transition-transform duration-200 active:scale-[0.98] hover:scale-[1.02]"
                 >
                   <img
                     src={poster.src}
@@ -299,26 +317,28 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
             </div>
           </div>
 
-          {/* Right Side: Editorial Project Info (100% Fixed and stationary alongside scrolling posters) */}
+          {/* Desktop Right Side: Editorial Project Info (hidden on mobile, visible lg:flex) */}
           <div
             onWheel={handleSideWheel}
-            className="w-full lg:w-[32%] xl:w-[30%] lg:pl-6 xl:pl-8 text-left shrink-0 select-none pointer-events-auto pt-2 pb-4 lg:pb-0"
+            className="hidden lg:flex w-full lg:w-[32%] xl:w-[30%] h-full flex-col justify-end text-left shrink-0 select-none pointer-events-auto pb-20 lg:pl-6 xl:pl-8 lg:pr-8"
           >
-            <h1 className="text-[clamp(2.4rem,4.5vw,5rem)] font-thebold font-bold text-black uppercase leading-[0.85] tracking-tight m-0 p-0 transition-all duration-300">
-              {splitWordsEvery2(project.title).map((line, idx) => (
-                <span key={idx} className="block leading-[0.85]">
-                  {line}
-                </span>
-              ))}
-            </h1>
+            <div className="max-w-[430px] text-left py-[20px]">
+              <h1 className="text-[clamp(2.4rem,4.5vw,5rem)] font-thebold font-bold text-black uppercase leading-[0.92] tracking-tight m-0 p-0 pt-1 pb-1 no-underline border-none decoration-transparent transition-all duration-300 mb-4 sm:mb-5 md:mb-6">
+                {splitWordsEvery2(project.title).map((line, idx) => (
+                  <span key={idx} className="block leading-[0.92] no-underline border-none decoration-transparent">
+                    {line}
+                  </span>
+                ))}
+              </h1>
 
-            <p className="font-neue text-[14px] sm:text-[15px] leading-[1.38] md:leading-[1.42] text-black font-normal mt-4 sm:mt-6 max-w-[380px] tracking-tight sm:tracking-normal transition-all duration-300">
-              {project.description}
-            </p>
+              <p className="font-neue text-[14px] sm:text-[15px] leading-[1.38] md:leading-[1.42] text-black font-normal mb-3 sm:mb-4 md:mb-5 tracking-tight sm:tracking-normal transition-all duration-300">
+                {project.description}
+              </p>
 
-            <p className="font-neue text-[11px] sm:text-[12px] font-medium tracking-[0.06em] text-black uppercase mt-4 sm:mt-5 transition-all duration-300">
-              {project.tags}
-            </p>
+              <p className="font-neue text-[11px] sm:text-[12px] font-medium tracking-[0.06em] text-black uppercase transition-all duration-300">
+                {project.tags}
+              </p>
+            </div>
           </div>
         </div>
       </div>
