@@ -272,7 +272,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
         {/* MOBILE LAYOUT (lg:hidden): Fixed Top Editorial Block + Scrollable 2-Column Poster Grid */}
         <div className="flex lg:hidden flex-col h-full w-full overflow-hidden">
           {/* Fixed Top Content Block - stationary when posters scroll below */}
-          <div className="shrink-0 pt-[120px] px-[20px] pb-[28px] text-left select-none bg-white z-20 pointer-events-auto">
+          <div className="shrink-0 pt-[120px] px-[20px] pb-[20px] text-left select-none bg-white z-20 pointer-events-auto">
             <h1 className="text-[34px] sm:text-[38px] font-thebold font-bold text-black uppercase leading-[0.92] tracking-tight m-0 p-0 transition-all duration-300">
               {splitWordsEvery2(project.title).map((line, idx) => (
                 <span key={idx} className="block leading-[0.92]">
@@ -281,11 +281,11 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
               ))}
             </h1>
 
-            <p className="font-neue text-[13.5px] sm:text-[14px] leading-[1.38] text-black font-normal mt-[24px] max-w-[480px] tracking-tight transition-all duration-300">
+            <p className="font-neue text-[13.5px] sm:text-[14px] leading-[1.38] text-black font-normal mt-[18px] max-w-[480px] tracking-tight transition-all duration-300">
               {project.description}
             </p>
 
-            <p className="font-neue text-[11px] font-medium tracking-[0.06em] text-black uppercase mt-[24px] transition-all duration-300">
+            <p className="font-neue text-[11px] font-medium tracking-[0.06em] text-black uppercase mt-[18px] transition-all duration-300">
               {project.tags}
             </p>
           </div>
