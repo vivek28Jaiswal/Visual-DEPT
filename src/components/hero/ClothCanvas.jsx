@@ -2,9 +2,16 @@ import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { gsap } from '@/lib/gsap'
 import { Cloth } from '@/lib/clothSim'
-import post1 from '@/assets/images/post1.jpg'
-import post2 from '@/assets/images/post2.jfif'
-import post3 from '@/assets/images/post3.jfif'
+import post1 from '@/assets/images/post1.webp'
+import post2 from '@/assets/images/post2.webp'
+import post3 from '@/assets/images/post3.webp'
+import post4 from '@/assets/images/post4.webp'
+import post5 from '@/assets/images/post5.webp'
+import post6 from '@/assets/images/post6.webp'
+import post7 from '@/assets/images/post7.webp'
+import post8 from '@/assets/images/post8.webp'
+import post9 from '@/assets/images/post9.webp'
+import post10 from '@/assets/images/post10.webp'
 
 /**
  * Creates an ultra-soft radial ambient drop shadow texture
@@ -95,9 +102,14 @@ function createClothMaterial(texture) {
   })
 }
 
-export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }) {
+export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0, onActiveProjectChange }) {
   const canvasRef = useRef(null)
   const lastActiveProjectRef = useRef(0)
+  const targetProjectRef = useRef(activeProjectIndex)
+
+  useEffect(() => {
+    targetProjectRef.current = activeProjectIndex
+  }, [activeProjectIndex])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -109,8 +121,8 @@ export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }
     // Three.js Scene Setup
     const scene = new THREE.Scene()
 
-    // 1:1 Pixel Mapping Perspective Camera
-    const fov = 45
+    // 1:1 Pixel Mapping Perspective Camera with Enhanced 3D Foreshortening
+    const fov = 48
     const cameraZ = height / (2 * Math.tan((fov * Math.PI) / 360))
     const camera = new THREE.PerspectiveCamera(fov, width / height, 1, cameraZ * 4)
     camera.position.set(0, 0, cameraZ)
@@ -139,19 +151,30 @@ export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }
       return tex
     }
 
-    const textures = [loadTex(post3), loadTex(post2), loadTex(post1)]
+    const textures = [
+      loadTex(post3), // 0: SEOUL STREET
+      loadTex(post1), // 1: BRUTO SPECIALTY COFFEE
+      loadTex(post2), // 2: KOREAN STREET MARKET
+      loadTex(post4), // 3: MADE FOR MORE
+      loadTex(post5), // 4: CUKE PICKLES
+      loadTex(post6), // 5: COSTRA BURGERS
+      loadTex(post7), // 6: BLUEBERRY CRISP
+      loadTex(post8), // 7: GASTOWN SUNDAY SET
+      loadTex(post9), // 8: WILD GROVE
+      loadTex(post10), // 9: LUSH HAIRCARE
+    ]
     const shadowTex = createSoftShadowTexture()
 
     // Cloth Grid Resolution (15 x 20 particles = silky XPBD fabric physics)
     const NX = 15
     const NY = 20
 
-    // 9 Cloth Posters Sequence along the diagonal ribbon
-    const N = 9
-    const dxVw = 19.5 // vw spacing between card centers along diagonal
-    const totalDistVw = N * dxVw // 175.5vw
+    // 10 Cloth Posters Sequence along the diagonal ribbon (showcasing all 10 real projects)
+    const N = 10
+    const dxVw = 21 // vw spacing between card centers along diagonal
+    const totalDistVw = N * dxVw // 210vw
     const minXVw = -28
-    const maxXvw = minXVw + totalDistVw
+    const maxXvw = minXVw + totalDistVw // 182vw
     const wrapX = gsap.utils.wrap(minXVw, maxXvw)
 
     // Base card dimensions (3:4 portrait aspect ratio)
@@ -167,7 +190,7 @@ export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }
       cloth.wake()
 
       const geometry = new THREE.PlaneGeometry(baseW, baseH, NX - 1, NY - 1)
-      const material = createClothMaterial(textures[i % 3])
+      const material = createClothMaterial(textures[i % textures.length])
       const mesh = new THREE.Mesh(geometry, material)
       scene.add(mesh)
       sheetMeshes.push(mesh)
@@ -208,8 +231,9 @@ export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }
     // =========================================================================
     // Direct, Butter-Smooth Drag & Elastic Anticipation Scroll
     // =========================================================================
-    let currentOffset = -8.5
-    let targetOffset = -8.5
+    const initialTargetCard = activeProjectIndex || 0
+    let currentOffset = 50 - initialTargetCard * dxVw
+    let targetOffset = currentOffset
     let momentumVelocity = 0
     let isDragging = false
     let lastAlong = 0
@@ -299,7 +323,6 @@ export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }
     window.addEventListener('pointerup', onPointerUp)
     window.addEventListener('pointercancel', onPointerUp)
     canvas.addEventListener('wheel', onWheel, { passive: false })
-    window.addEventListener('wheel', onWheel, { passive: false })
 
     // Window Resize Handler
     const handleResize = () => {
@@ -332,38 +355,48 @@ export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }
         momentumVelocity = 0
       }
 
+      // Programmatic centering if project changed externally (e.g. from Index/Gallery click)
+      if (targetProjectRef.current !== lastActiveProjectRef.current) {
+        const targetCard = targetProjectRef.current
+        const desiredOffset = 50 - targetCard * dxVw
+        let diff = (desiredOffset - targetOffset) % totalDistVw
+        if (diff > totalDistVw / 2) diff -= totalDistVw
+        if (diff < -totalDistVw / 2) diff += totalDistVw
+        targetOffset += diff
+        lastActiveProjectRef.current = targetProjectRef.current
+      }
+
       // Elastic Viscosity Easing (The "delay sa anticipation" after-effect):
-      // Lower factor (0.065) creates that luscious, weighted lag where targetOffset
-      // leads and currentOffset chases with cinematic ease.
-      const easeFactor = isDragging ? 0.16 : 0.065
+      const easeFactor = isDragging ? 0.16 : 0.075
       const lag = targetOffset - currentOffset
       currentOffset += lag * easeFactor
 
       // Subtle dynamic inertia lean based on scroll lag (anticipation tilt)
-      const anticipationInertia = THREE.MathUtils.clamp(lag * 0.22, -4.5, 4.5)
+      const anticipationInertia = THREE.MathUtils.clamp(lag * 0.12, -1.5, 1.5)
 
       // Synchronize with background typography
       if (motionProgressRef) {
         motionProgressRef.current = currentOffset / 0.08
       }
 
-      // Track which project is closest to screen center (xVw ≈ 50vw)
+      // Track which project card is centered
       let minCenterDist = Infinity
-      let activeIdx = 0
+      let candidateCard = 0
       for (let i = 0; i < N; i++) {
         const rawX = i * dxVw + currentOffset
         const xVw = wrapX(rawX)
         const dist = Math.abs(xVw - 50)
         if (dist < minCenterDist) {
           minCenterDist = dist
-          activeIdx = i % 3
+          candidateCard = i
         }
       }
 
-      if (lastActiveProjectRef.current !== activeIdx) {
-        lastActiveProjectRef.current = activeIdx
+      const activeProject = candidateCard
+      if (minCenterDist < 11 && lastActiveProjectRef.current !== activeProject) {
+        lastActiveProjectRef.current = activeProject
         if (onActiveProjectChange) {
-          onActiveProjectChange(activeIdx)
+          onActiveProjectChange(activeProject)
         }
       }
 
@@ -401,28 +434,33 @@ export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }
         const xVw = wrapX(rawX)
         const t = (xVw - minXVw) / totalDistVw
 
-        // Dynamic ascending diagonal trajectory from bottom-left to top-right
-        // At t = 0 (bottom-left): yVh ≈ 88vh (comfortably grounded in lower-left)
-        // At t = 0.5 (center): yVh ≈ 49vh (exact screen center)
-        // At t = 1.0 (top-right): yVh ≈ 10vh (rises towards upper-right)
-        const yVh = 88 - t * 78
+        // Balanced diagonal trajectory across center viewport
+        // At t = 0 (bottom-left): yVh ≈ 74vh (comfortable lower-left)
+        // At t = 0.5 (center): yVh ≈ 50vh (exact screen center)
+        // At t = 1.0 (top-right): yVh ≈ 26vh (upper-right, clean clearance below header)
+        const yVh = 74 - t * 48
 
-        // Smooth size progression from small (bottom-left) to large (top-right)
-        const scale = 0.65 + t * 0.75
+        // Elegant size progression from gentle (bottom-left) to prominent (top-right)
+        const scale = 0.84 + t * 0.28
 
-        // Natural distinct 3D rotations with dynamic inertial anticipation
-        const dynamicRotZ = THREE.MathUtils.degToRad(-16 + t * 36) - THREE.MathUtils.degToRad(anticipationInertia * 0.7)
-        const dynamicRotY = THREE.MathUtils.degToRad(14 - t * 28) + THREE.MathUtils.degToRad(anticipationInertia * 0.5)
-        const rotX = THREE.MathUtils.degToRad(6 - t * 12)
+        // Refined, prestige 3D perspective orientation:
+        // 1. Pitch (rotX): Tasteful backward lean (12° to 15°) creating authentic depth without distortion
+        const rotX = THREE.MathUtils.degToRad(12 + Math.sin(t * Math.PI) * 3)
 
-        // Strict z-depth layering
-        const zDepth = -120 + t * 240
+        // 2. Yaw (rotY): Gentle inward arc (+6° on bottom-left to -6° on top-right)
+        const dynamicRotY = THREE.MathUtils.degToRad(6 - t * 12) + THREE.MathUtils.degToRad(anticipationInertia * 0.25)
+
+        // 3. Roll (rotZ): Subtle natural diagonal alignment (-5° to -9°)
+        const dynamicRotZ = THREE.MathUtils.degToRad(-5 - t * 4) - THREE.MathUtils.degToRad(anticipationInertia * 0.25)
+
+        // Layered z-depth
+        const zDepth = -50 + t * 100
 
         // Convert vw / vh to Three.js pixel coordinates
         const pixelX = (xVw / 100) * width - width / 2
         const pixelY = height / 2 - (yVh / 100) * height
 
-        // Update mesh transform with dynamic rotation lean
+        // Update mesh transform with true 3D perspective orientation
         item.mesh.position.set(pixelX, pixelY, zDepth)
         item.mesh.rotation.set(rotX, dynamicRotY, dynamicRotZ)
         item.mesh.scale.set(scale, scale, scale)
@@ -532,7 +570,6 @@ export default function ClothCanvas({ motionProgressRef, onActiveProjectChange }
       window.removeEventListener('pointerup', onPointerUp)
       window.removeEventListener('pointercancel', onPointerUp)
       canvas.removeEventListener('wheel', onWheel)
-      window.removeEventListener('wheel', onWheel)
       window.removeEventListener('resize', handleResize)
       renderer.dispose()
     }

@@ -7,8 +7,7 @@
 
 @font-face {
   font-family: 'TheBoldFont';
-  src: url('/fonts/THEBOLDFONT-FREEVERSION.otf') format('opentype'),
-       url('/fonts/THEBOLDFONT-FREEVERSION.ttf') format('truetype');
+  src: url('/fonts/THEBOLDFONT-FREEVERSION.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -16,7 +15,7 @@
 
 @font-face {
   font-family: 'PPNeueMontreal';
-  src: url('/fonts/PPNeueMontreal-Regular.ttf') format('truetype');
+  src: url('/fonts/PPNeueMontreal-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -115,4 +114,13 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Completely hide visible scrollbars across all browsers */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
