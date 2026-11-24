@@ -6,7 +6,7 @@ export default function App() {
   const [isGridView, setIsGridView] = useState(false)
 
   return (
-    <main className="min-h-screen bg-[#F0F0F0] text-black">
+    <main className="min-h-screen h-[100dvh] bg-white text-black overflow-hidden">
       <Navbar isGridView={isGridView} onToggleView={setIsGridView} />
       <HeroSection isGridView={isGridView} onToggleView={setIsGridView} />
     </main>

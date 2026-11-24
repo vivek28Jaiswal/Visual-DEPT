@@ -217,7 +217,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
   return (
     <section
       data-lenis-prevent
-      className="relative w-full h-screen overflow-hidden bg-[#F0F0F0] select-none"
+      className="relative w-full h-[100dvh] overflow-hidden bg-white select-none"
     >
       {/* 1. 3D Floating Cloth View Mode (Gallery View) */}
       <div
@@ -226,13 +226,13 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
         }`}
       >
         {/* Top-Left Brand Name (Editorial Typography) */}
-        <div className="absolute top-[92px] sm:top-28 md:top-32 left-[20px] sm:left-7 md:left-8 z-10 pointer-events-none max-w-[calc(100vw-40px)] md:max-w-[80vw]">
+        <div className="absolute top-[120px] sm:top-28 md:top-32 left-[20px] sm:left-7 md:left-8 z-10 pointer-events-none max-w-[calc(100vw-40px)] md:max-w-[80vw]">
           <h1
             key={project.title}
-            className="text-[34px] sm:text-[44px] md:text-[clamp(2.4rem,5.5vw,5.2rem)] font-thebold font-bold text-black uppercase leading-[0.88] tracking-tight m-0 p-0 transition-all duration-500 ease-out animate-fadeIn"
+            className="text-[34px] sm:text-[44px] md:text-[clamp(2.4rem,5.5vw,5.2rem)] font-thebold font-bold text-black uppercase leading-[0.92] tracking-tight m-0 p-0 transition-all duration-500 ease-out animate-fadeIn"
           >
             {splitWordsEvery2(project.title).map((line, idx) => (
-              <span key={idx} className="block leading-[0.88]">
+              <span key={idx} className="block leading-[0.92]">
                 {line}
               </span>
             ))}
@@ -243,7 +243,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
         <div className="absolute bottom-[32px] left-[20px] right-[20px] md:left-auto md:right-8 md:bottom-20 z-10 pointer-events-none max-w-[calc(100vw-40px)] md:max-w-[430px] text-left">
           <p
             key={project.description}
-            className="font-neue text-[14px] sm:text-[15px] leading-[1.38] md:leading-[1.42] text-black font-normal mb-3 sm:mb-4 md:mb-5 tracking-tight sm:tracking-normal transition-all duration-500 ease-out animate-fadeIn"
+            className="font-neue text-[14px] sm:text-[15px] leading-[1.38] md:leading-[1.42] text-black font-normal mb-7 tracking-tight sm:tracking-normal transition-all duration-500 ease-out animate-fadeIn"
           >
             {project.description}
           </p>
@@ -265,46 +265,42 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
 
       {/* 2. Index View Mode (matching user reference screenshot media_1795502178295_17af06c6.jpg on mobile & media_1795447331044_178c8656.jpg on desktop) */}
       <div
-        className={`absolute inset-0 z-30 flex flex-col bg-[#F0F0F0] transition-opacity duration-500 pt-[70px] md:pt-28 lg:pt-32 pb-0 px-[20px] sm:px-7 md:px-8 ${
+        className={`absolute inset-0 z-30 flex flex-col bg-white transition-opacity duration-500 ${
           isGridView ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
-        {/* Mobile Fixed Top Editorial Content (lg:hidden) - with exact 20px top and 20px bottom spacing */}
-        <div className="block lg:hidden shrink-0 pt-[20px] pb-[20px] text-left select-none">
-          <h1 className="text-[32px] sm:text-[38px] font-thebold font-bold text-black uppercase leading-[0.96] tracking-tight m-0 p-0 pt-1 pb-1 no-underline border-none decoration-transparent transition-all duration-300">
-            {splitWordsEvery2(project.title).map((line, idx) => (
-              <span key={idx} className="block leading-[0.96] no-underline border-none decoration-transparent">
-                {line}
-              </span>
-            ))}
-          </h1>
+        {/* MOBILE LAYOUT (lg:hidden): Fixed Top Editorial Block + Scrollable 2-Column Poster Grid */}
+        <div className="flex lg:hidden flex-col h-full w-full overflow-hidden">
+          {/* Fixed Top Content Block - stationary when posters scroll below */}
+          <div className="shrink-0 pt-[120px] px-[20px] pb-[28px] text-left select-none bg-white z-20 pointer-events-auto">
+            <h1 className="text-[34px] sm:text-[38px] font-thebold font-bold text-black uppercase leading-[0.92] tracking-tight m-0 p-0 transition-all duration-300">
+              {splitWordsEvery2(project.title).map((line, idx) => (
+                <span key={idx} className="block leading-[0.92]">
+                  {line}
+                </span>
+              ))}
+            </h1>
 
-          <p className="font-neue text-[13px] sm:text-[14px] leading-[1.38] text-black font-normal mt-2.5 max-w-[480px] tracking-tight transition-all duration-300">
-            {project.description}
-          </p>
+            <p className="font-neue text-[13.5px] sm:text-[14px] leading-[1.38] text-black font-normal mt-[24px] max-w-[480px] tracking-tight transition-all duration-300">
+              {project.description}
+            </p>
 
-          <p className="font-neue text-[11px] font-medium tracking-[0.06em] text-black uppercase mt-2.5 transition-all duration-300">
-            {project.tags}
-          </p>
-        </div>
+            <p className="font-neue text-[11px] font-medium tracking-[0.06em] text-black uppercase mt-[24px] transition-all duration-300">
+              {project.tags}
+            </p>
+          </div>
 
-        {/* Main Content Area: Split-Screen on Desktop, Scrollable Grid on Mobile */}
-        <div className="w-full flex-1 min-h-0 flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-8">
-          {/* Scrollable Poster Grid (4-cols on desktop, 2-cols on mobile) */}
+          {/* Scrollable 2-Column Poster Grid */}
           <div
             ref={gridScrollRef}
-            className="w-full lg:w-[68%] xl:w-[70%] h-full overflow-y-auto no-scrollbar pt-2 pr-1 sm:pr-2 pb-[32px] lg:pb-28 select-none"
+            className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar px-[20px] pb-[32px] pt-1 select-none pointer-events-auto"
           >
-            <div
-              ref={gridContentRef}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-4 md:gap-4.5"
-            >
+            <div className="grid grid-cols-2 gap-6">
               {INDEX_POSTERS.map((poster, idx) => (
                 <div
                   key={idx}
                   onClick={() => handlePosterClick(poster.projectIdx)}
-                  onMouseEnter={() => handlePosterHover(poster.projectIdx)}
-                  className="relative aspect-[3/4] w-full overflow-hidden cursor-pointer group transition-transform duration-200 active:scale-[0.98] hover:scale-[1.02]"
+                  className="relative aspect-[3/4.1] w-full overflow-hidden cursor-pointer group transition-transform duration-200 active:scale-[0.98]"
                 >
                   <img
                     src={poster.src}
@@ -316,28 +312,59 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Desktop Right Side: Editorial Project Info (hidden on mobile, visible lg:flex) */}
-          <div
-            onWheel={handleSideWheel}
-            className="hidden lg:flex w-full lg:w-[32%] xl:w-[30%] h-full flex-col justify-end text-left shrink-0 select-none pointer-events-auto pb-20 lg:pl-6 xl:pl-8 lg:pr-8"
-          >
-            <div className="max-w-[430px] text-left py-[20px]">
-              <h1 className="text-[clamp(2.4rem,4.5vw,5rem)] font-thebold font-bold text-black uppercase leading-[0.92] tracking-tight m-0 p-0 pt-1 pb-1 no-underline border-none decoration-transparent transition-all duration-300 mb-4 sm:mb-5 md:mb-6">
-                {splitWordsEvery2(project.title).map((line, idx) => (
-                  <span key={idx} className="block leading-[0.92] no-underline border-none decoration-transparent">
-                    {line}
-                  </span>
+        {/* DESKTOP LAYOUT (hidden lg:flex): Split-Screen 4-Column Poster Grid on Left, Editorial on Right */}
+        <div className="hidden lg:flex flex-col h-full w-full pt-28 lg:pt-32 pb-0 px-8">
+          <div className="w-full flex-1 min-h-0 flex flex-row items-start justify-between gap-8">
+            {/* Scrollable 4-Col Poster Grid */}
+            <div
+              className="w-[68%] xl:w-[70%] h-full overflow-y-auto no-scrollbar pt-2 pr-2 pb-28 select-none"
+            >
+              <div
+                ref={gridContentRef}
+                className="grid grid-cols-4 gap-4.5"
+              >
+                {INDEX_POSTERS.map((poster, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => handlePosterClick(poster.projectIdx)}
+                    onMouseEnter={() => handlePosterHover(poster.projectIdx)}
+                    className="relative aspect-[3/4] w-full overflow-hidden cursor-pointer group transition-transform duration-200 active:scale-[0.98] hover:scale-[1.02]"
+                  >
+                    <img
+                      src={poster.src}
+                      alt={poster.alt}
+                      className="w-full h-full object-cover rounded-none select-none pointer-events-none"
+                      loading="lazy"
+                    />
+                  </div>
                 ))}
-              </h1>
+              </div>
+            </div>
 
-              <p className="font-neue text-[14px] sm:text-[15px] leading-[1.38] md:leading-[1.42] text-black font-normal mb-3 sm:mb-4 md:mb-5 tracking-tight sm:tracking-normal transition-all duration-300">
-                {project.description}
-              </p>
+            {/* Desktop Right Side: Editorial Project Info */}
+            <div
+              onWheel={handleSideWheel}
+              className="w-[32%] xl:w-[30%] h-full flex flex-col justify-end text-left shrink-0 select-none pointer-events-auto pb-20 pl-6 xl:pl-8 pr-8"
+            >
+              <div className="max-w-[430px] text-left py-[20px]">
+                <h1 className="text-[clamp(2.4rem,4.5vw,5rem)] font-thebold font-bold text-black uppercase leading-[0.92] tracking-tight m-0 p-0 mb-6 transition-all duration-300">
+                  {splitWordsEvery2(project.title).map((line, idx) => (
+                    <span key={idx} className="block leading-[0.92]">
+                      {line}
+                    </span>
+                  ))}
+                </h1>
 
-              <p className="font-neue text-[11px] sm:text-[12px] font-medium tracking-[0.06em] text-black uppercase transition-all duration-300">
-                {project.tags}
-              </p>
+                <p className="font-neue text-[14px] sm:text-[15px] leading-[1.42] text-black font-normal mb-5 tracking-normal transition-all duration-300">
+                  {project.description}
+                </p>
+
+                <p className="font-neue text-[11px] sm:text-[12px] font-medium tracking-[0.06em] text-black uppercase transition-all duration-300">
+                  {project.tags}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -348,7 +375,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
         <button
           type="button"
           onClick={() => onToggleView && onToggleView(!isGridView)}
-          className="px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-white text-black font-neue text-sm sm:text-base font-medium leading-none cursor-pointer tracking-normal transition-transform duration-200 active:scale-95 select-none"
+          className="px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-black text-white font-neue text-sm sm:text-base font-medium leading-none cursor-pointer tracking-normal transition-transform duration-200 active:scale-95 select-none"
         >
           {isGridView ? 'Gallery' : 'Index'}
         </button>
