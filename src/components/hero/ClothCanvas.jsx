@@ -259,6 +259,8 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
     }
 
     const onPointerDown = (e) => {
+      // Touch events are cleanly handled by dedicated onTouchStart below
+      if (e.pointerType === 'touch') return
       if (e.target.closest('button')) return
       isDragging = true
       lastX = e.clientX
@@ -275,6 +277,7 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
     }
 
     const onPointerMove = (e) => {
+      if (e.pointerType === 'touch') return
       const now = performance.now()
       const dt = Math.max(1, now - lastMoveTime)
       lastMoveTime = now
@@ -282,31 +285,21 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
       updateMousePos(e.clientX, e.clientY)
 
       if (isDragging) {
-        const isMobileNow = (canvas.clientWidth || window.innerWidth) < 768
-        let delta = 0
-
-        if (isMobileNow) {
-          // On mobile: dragging UP (dy > 0) or LEFT (dx > 0) advances cards forward
-          const dy = lastY - e.clientY
-          const dx = lastX - e.clientX
-          delta = dy * 1.5 + dx * 1.2
-        } else {
-          // On desktop: along the diagonal ribbon trajectory
-          const curAlong = along(e.clientX, e.clientY)
-          delta = (lastAlong - curAlong) * 1.5
-          lastAlong = curAlong
-        }
+        const curAlong = along(e.clientX, e.clientY)
+        const delta = (lastAlong - curAlong) * 1.5
+        lastAlong = curAlong
 
         lastX = e.clientX
         lastY = e.clientY
 
-        targetOffset += delta * (isMobileNow ? 0.16 : 0.08)
+        targetOffset += delta * 0.08
         // Instant velocity tracking for flick momentum
         dragVelocity = (delta / dt) * 16
       }
     }
 
     const onPointerUp = (e) => {
+      if (e.pointerType === 'touch') return
       if (!isDragging) return
       isDragging = false
 
@@ -322,7 +315,7 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
       dragVelocity = 0
     }
 
-    // Explicit touch handlers for mobile to prevent browser gesture cancellation
+    // Dedicated Native Touch Handlers for Mobile (guaranteed 100% responsiveness on iPhone/Android)
     const onTouchStart = (e) => {
       if (e.target.closest('button')) return
       if (!e.touches || e.touches.length === 0) return
@@ -347,16 +340,17 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
 
       updateMousePos(touch.clientX, touch.clientY)
 
-      // Swiping UP (touch.clientY < lastY) advances cards forward
+      // Swiping UP (touch.clientY < lastY) advances cards forward (same as mouse wheel down)
       // Swiping DOWN (touch.clientY > lastY) moves cards backward
       const dy = lastY - touch.clientY
       const dx = lastX - touch.clientX
       lastX = touch.clientX
       lastY = touch.clientY
 
-      const delta = dy * 1.5 + dx * 1.2
-      targetOffset += delta * 0.16
-      dragVelocity = (delta / dt) * 16
+      // High sensitivity for effortless finger flicking
+      const delta = dy * 1.8 + dx * 1.4
+      targetOffset += delta * 0.18
+      dragVelocity = (delta / dt) * 18
     }
 
     const onTouchEnd = () => {
@@ -364,8 +358,8 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
       isDragging = false
 
       const now = performance.now()
-      if (now - lastMoveTime < 130 && Math.abs(dragVelocity) > 0.3) {
-        momentumVelocity += dragVelocity * 0.18
+      if (now - lastMoveTime < 140 && Math.abs(dragVelocity) > 0.2) {
+        momentumVelocity += dragVelocity * 0.24
       }
       dragVelocity = 0
     }
@@ -388,7 +382,7 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
     window.addEventListener('pointermove', onPointerMove, { passive: false })
     window.addEventListener('pointerup', onPointerUp)
     window.addEventListener('pointercancel', onPointerUp)
-    canvas.addEventListener('touchstart', onTouchStart, { passive: true })
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false })
     window.addEventListener('touchmove', onTouchMove, { passive: false })
     window.addEventListener('touchend', onTouchEnd)
     window.addEventListener('touchcancel', onTouchEnd)
@@ -439,7 +433,7 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
       }
 
       // Programmatic centering if project changed externally (e.g. from Index/Gallery click)
-      if (targetProjectRef.current !== lastActiveProjectRef.current) {
+      if (!isDragging && targetProjectRef.current !== lastActiveProjectRef.current) {
         const targetCard = targetProjectRef.current
         const desiredOffset = 50 - targetCard * dxVw
         let diff = (desiredOffset - targetOffset) % totalDistVw
@@ -680,6 +674,7 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
   return (
     <canvas
       ref={canvasRef}
+      style={{ touchAction: 'none' }}
       className="absolute inset-0 w-full h-full select-none z-20 cursor-grab active:cursor-grabbing pointer-events-auto touch-none"
     />
   )

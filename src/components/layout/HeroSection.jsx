@@ -222,7 +222,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
       {/* 1. 3D Floating Cloth View Mode (Gallery View) */}
       <div
         className={`absolute inset-0 transition-opacity duration-500 ${
-          isGridView ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'
+          isGridView ? 'opacity-0 pointer-events-none invisible' : 'opacity-100 pointer-events-auto visible'
         }`}
       >
         {/* Top-Left Brand Name (Editorial Typography) */}
@@ -240,7 +240,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
         </div>
 
         {/* Bottom Paragraph & Project Tags */}
-        <div className="absolute bottom-[32px] left-[20px] right-[20px] md:left-auto md:right-8 md:bottom-20 z-10 pointer-events-none max-w-[calc(100vw-40px)] md:max-w-[430px] text-left">
+        <div className="absolute bottom-[32px] left-[20px] right-[20px] md:left-auto md:right-8 md:bottom-7 z-10 pointer-events-none max-w-[calc(100vw-40px)] md:max-w-[430px] text-left">
           <p
             key={project.description}
             className="font-neue text-[14px] sm:text-[15px] leading-[1.38] md:leading-[1.42] text-black font-normal mb-7 tracking-tight sm:tracking-normal transition-all duration-500 ease-out animate-fadeIn"
@@ -266,7 +266,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
       {/* 2. Index View Mode (matching user reference screenshot media_1795502178295_17af06c6.jpg on mobile & media_1795447331044_178c8656.jpg on desktop) */}
       <div
         className={`absolute inset-0 z-30 flex flex-col bg-white transition-opacity duration-500 ${
-          isGridView ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          isGridView ? 'opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible'
         }`}
       >
         {/* MOBILE LAYOUT (lg:hidden): Fixed Top Editorial Block + Scrollable 2-Column Poster Grid */}
@@ -346,9 +346,9 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
             {/* Desktop Right Side: Editorial Project Info */}
             <div
               onWheel={handleSideWheel}
-              className="w-[32%] xl:w-[30%] h-full flex flex-col justify-end text-left shrink-0 select-none pointer-events-auto pb-20 pl-6 xl:pl-8 pr-8"
+              className="w-[32%] xl:w-[30%] h-full flex flex-col justify-end text-left shrink-0 select-none pointer-events-auto pb-6 sm:pb-7 pl-6 xl:pl-8 pr-8"
             >
-              <div className="max-w-[430px] text-left py-[20px]">
+              <div className="max-w-[430px] text-left pb-1">
                 <h1 className="text-[clamp(2.4rem,4.5vw,5rem)] font-thebold font-bold text-black uppercase leading-[0.92] tracking-tight m-0 p-0 mb-6 transition-all duration-300">
                   {splitWordsEvery2(project.title).map((line, idx) => (
                     <span key={idx} className="block leading-[0.92]">
