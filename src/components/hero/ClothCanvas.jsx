@@ -171,14 +171,15 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
 
     // 10 Cloth Posters Sequence along the diagonal ribbon (showcasing all 10 real projects)
     const N = 10
-    const dxVw = 21 // vw spacing between card centers along diagonal
-    const totalDistVw = N * dxVw // 210vw
-    const minXVw = -28
-    const maxXvw = minXVw + totalDistVw // 182vw
-    const wrapX = gsap.utils.wrap(minXVw, maxXvw)
+    const isMobileInitial = width < 768
+    const dxVwInitial = isMobileInitial ? 48 : 21
+    const totalDistVwInitial = N * dxVwInitial
+    const minXVwInitial = isMobileInitial ? -48 : -28
+    const maxXvwInitial = minXVwInitial + totalDistVwInitial
+    const wrapXInitial = gsap.utils.wrap(minXVwInitial, maxXvwInitial)
 
     // Base card dimensions (3:4 portrait aspect ratio)
-    const baseW = Math.max(260, Math.min(width * 0.24, 370))
+    const baseW = 260
     const baseH = baseW * (4 / 3)
 
     const sheets = []
@@ -232,7 +233,7 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
     // Direct, Butter-Smooth Drag & Elastic Anticipation Scroll
     // =========================================================================
     const initialTargetCard = activeProjectIndex || 0
-    let currentOffset = 50 - initialTargetCard * dxVw
+    let currentOffset = 50 - initialTargetCard * dxVwInitial
     let targetOffset = currentOffset
     let momentumVelocity = 0
     let isDragging = false
@@ -278,11 +279,12 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
 
       if (isDragging) {
         const curAlong = along(e.clientX, e.clientY)
+        const isMobileNow = (canvas.clientWidth || window.innerWidth) < 768
         // Dragging along the diagonal towards top-right advances the sequence
-        const delta = (lastAlong - curAlong) * 1.5
+        const delta = (lastAlong - curAlong) * (isMobileNow ? 2.0 : 1.5)
         lastAlong = curAlong
 
-        targetOffset += delta * 0.08
+        targetOffset += delta * (isMobileNow ? 0.14 : 0.08)
         // Instant velocity tracking
         dragVelocity = (delta / dt) * 16
       }
@@ -347,6 +349,19 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
       const dt = Math.min((now - lastClock) / 1000, 0.033)
       lastClock = now
 
+      const currentWidth = canvas.clientWidth || width
+      const isMobileNow = currentWidth < 768
+      const targetW = isMobileNow
+        ? Math.max(195, Math.min(currentWidth * 0.54, 255))
+        : Math.max(260, Math.min(currentWidth * 0.24, 370))
+      const responsiveScale = targetW / baseW
+
+      const dxVw = isMobileNow ? 48 : 21
+      const totalDistVw = N * dxVw
+      const minXVw = isMobileNow ? -48 : -28
+      const maxXvw = minXVw + totalDistVw
+      const wrapX = gsap.utils.wrap(minXVw, maxXvw)
+
       // Apply luxurious exponential momentum friction with fluid deceleration
       if (Math.abs(momentumVelocity) > 0.001) {
         targetOffset += momentumVelocity
@@ -393,7 +408,8 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
       }
 
       const activeProject = candidateCard
-      if (minCenterDist < 11 && lastActiveProjectRef.current !== activeProject) {
+      const centerTolerance = isMobileNow ? 22 : 11
+      if (minCenterDist < centerTolerance && lastActiveProjectRef.current !== activeProject) {
         lastActiveProjectRef.current = activeProject
         if (onActiveProjectChange) {
           onActiveProjectChange(activeProject)
@@ -434,24 +450,38 @@ export default function ClothCanvas({ motionProgressRef, activeProjectIndex = 0,
         const xVw = wrapX(rawX)
         const t = (xVw - minXVw) / totalDistVw
 
-        // Balanced diagonal trajectory across center viewport
-        // At t = 0 (bottom-left): yVh ≈ 74vh (comfortable lower-left)
-        // At t = 0.5 (center): yVh ≈ 50vh (exact screen center)
-        // At t = 1.0 (top-right): yVh ≈ 26vh (upper-right, clean clearance below header)
-        const yVh = 74 - t * 48
+        // On mobile: strictly show only 3 cards on screen (active center card + 1 card on each side)
+        if (isMobileNow) {
+          const distFromCenter = Math.abs(xVw - 50)
+          const isVisible = distFromCenter < 72
+          item.mesh.visible = isVisible
+          if (item.shadowMesh) item.shadowMesh.visible = isVisible
+          if (!isVisible) continue
+        } else {
+          item.mesh.visible = true
+          if (item.shadowMesh) item.shadowMesh.visible = true
+        }
 
-        // Elegant size progression from gentle (bottom-left) to prominent (top-right)
-        const scale = 0.84 + t * 0.28
+        // Balanced diagonal trajectory across center viewport:
+        // On mobile: stays gently between 45vh and 53vh in the wide center whitespace
+        // On desktop: spans from 74vh down-left to 26vh up-right
+        const yVh = isMobileNow ? 49 - (t - 0.5) * 8 : 74 - t * 48
 
-        // Refined, prestige 3D perspective orientation:
-        // 1. Pitch (rotX): Tasteful backward lean (12° to 15°) creating authentic depth without distortion
-        const rotX = THREE.MathUtils.degToRad(12 + Math.sin(t * Math.PI) * 3)
+        // Elegant size progression with responsive scaling (larger, prominent cards on mobile)
+        const scale = (0.84 + t * 0.28) * responsiveScale
 
-        // 2. Yaw (rotY): Gentle inward arc (+6° on bottom-left to -6° on top-right)
-        const dynamicRotY = THREE.MathUtils.degToRad(6 - t * 12) + THREE.MathUtils.degToRad(anticipationInertia * 0.25)
+        // Refined 3D perspective orientation:
+        const rotX = isMobileNow
+          ? THREE.MathUtils.degToRad(8 + Math.sin(t * Math.PI) * 2)
+          : THREE.MathUtils.degToRad(12 + Math.sin(t * Math.PI) * 3)
 
-        // 3. Roll (rotZ): Subtle natural diagonal alignment (-5° to -9°)
-        const dynamicRotZ = THREE.MathUtils.degToRad(-5 - t * 4) - THREE.MathUtils.degToRad(anticipationInertia * 0.25)
+        const dynamicRotY = isMobileNow
+          ? THREE.MathUtils.degToRad(4 - t * 8) + THREE.MathUtils.degToRad(anticipationInertia * 0.2)
+          : THREE.MathUtils.degToRad(6 - t * 12) + THREE.MathUtils.degToRad(anticipationInertia * 0.25)
+
+        const dynamicRotZ = isMobileNow
+          ? THREE.MathUtils.degToRad(-4 - t * 3) - THREE.MathUtils.degToRad(anticipationInertia * 0.2)
+          : THREE.MathUtils.degToRad(-5 - t * 4) - THREE.MathUtils.degToRad(anticipationInertia * 0.25)
 
         // Layered z-depth
         const zDepth = -50 + t * 100

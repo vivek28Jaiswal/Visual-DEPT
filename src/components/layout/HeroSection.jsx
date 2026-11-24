@@ -226,25 +226,25 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
           isGridView ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'
         }`}
       >
-        {/* Top-Left Brand Name (Editorial Typography - aligned with left navbar px-5 sm:px-7 md:px-8) */}
-        <div className="absolute top-24 sm:top-28 md:top-32 left-5 sm:left-7 md:left-8 z-10 pointer-events-none max-w-[80vw]">
+        {/* Top-Left Brand Name (Editorial Typography) */}
+        <div className="absolute top-[92px] sm:top-28 md:top-32 left-[20px] sm:left-7 md:left-8 z-10 pointer-events-none max-w-[calc(100vw-40px)] md:max-w-[80vw]">
           <h1
             key={project.title}
-            className="text-[clamp(2.4rem,5.5vw,5.2rem)] font-thebold font-bold text-black uppercase leading-[0.82] tracking-tight m-0 p-0 transition-all duration-500 ease-out animate-fadeIn"
+            className="text-[34px] sm:text-[44px] md:text-[clamp(2.4rem,5.5vw,5.2rem)] font-thebold font-bold text-black uppercase leading-[0.88] tracking-tight m-0 p-0 transition-all duration-500 ease-out animate-fadeIn"
           >
             {splitWordsEvery2(project.title).map((line, idx) => (
-              <span key={idx} className="block leading-[0.82]">
+              <span key={idx} className="block leading-[0.88]">
                 {line}
               </span>
             ))}
           </h1>
         </div>
 
-        {/* Bottom-Right Paragraph & Project Tags */}
-        <div className="absolute bottom-16 sm:bottom-20 right-5 sm:right-7 md:right-8 z-10 pointer-events-none max-w-[360px] sm:max-w-[430px] text-left">
+        {/* Bottom Paragraph & Project Tags */}
+        <div className="absolute bottom-[32px] left-[20px] right-[20px] md:left-auto md:right-8 md:bottom-20 z-10 pointer-events-none max-w-[calc(100vw-40px)] md:max-w-[430px] text-left">
           <p
             key={project.description}
-            className="font-neue text-[14px] sm:text-[15px] leading-[1.42] text-black font-normal mb-5 tracking-tight sm:tracking-normal transition-all duration-500 ease-out animate-fadeIn"
+            className="font-neue text-[14px] sm:text-[15px] leading-[1.38] md:leading-[1.42] text-black font-normal mb-3 sm:mb-4 md:mb-5 tracking-tight sm:tracking-normal transition-all duration-500 ease-out animate-fadeIn"
           >
             {project.description}
           </p>
@@ -266,7 +266,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
 
       {/* 2. Index View Mode (matching user reference screenshot media_1795447331044_178c8656.jpg) */}
       <div
-        className={`absolute inset-0 z-30 flex bg-[#F0F0F0] transition-opacity duration-500 pt-28 sm:pt-32 md:pt-36 lg:pt-36 pb-20 px-5 sm:px-7 md:px-8 ${
+        className={`absolute inset-0 z-30 flex bg-[#F0F0F0] transition-opacity duration-500 pt-[88px] sm:pt-32 md:pt-36 pb-[32px] px-[20px] sm:px-7 md:px-8 ${
           isGridView ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -274,11 +274,11 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
           {/* Left Side: 4-Column Poster Grid (Silky Lenis Inertia Scroll, without any visible scrollbar) */}
           <div
             ref={gridScrollRef}
-            className="w-full lg:w-[68%] xl:w-[70%] h-full overflow-y-auto no-scrollbar pt-2 pr-2 pb-28 select-none"
+            className="w-full lg:w-[68%] xl:w-[70%] h-full overflow-y-auto no-scrollbar pt-2 pr-1 sm:pr-2 pb-20 lg:pb-28 select-none"
           >
             <div
               ref={gridContentRef}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-4.5"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-4 md:gap-4.5"
             >
               {INDEX_POSTERS.map((poster, idx) => (
                 <div
@@ -286,7 +286,7 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
                   onClick={() => handlePosterClick(poster.projectIdx)}
                   onMouseEnter={() => handlePosterHover(poster.projectIdx)}
                   onMouseMove={() => handlePosterHover(poster.projectIdx)}
-                  className="relative aspect-[3/4] w-full overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02]"
+                  className="relative aspect-[3/4] w-full overflow-hidden cursor-pointer group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <img
                     src={poster.src}
@@ -302,29 +302,29 @@ export default function HeroSection({ isGridView = false, onToggleView }) {
           {/* Right Side: Editorial Project Info (100% Fixed and stationary alongside scrolling posters) */}
           <div
             onWheel={handleSideWheel}
-            className="w-full lg:w-[32%] xl:w-[30%] lg:pl-6 xl:pl-8 text-left shrink-0 select-none pointer-events-auto pt-2"
+            className="w-full lg:w-[32%] xl:w-[30%] lg:pl-6 xl:pl-8 text-left shrink-0 select-none pointer-events-auto pt-2 pb-4 lg:pb-0"
           >
-            <h1 className="text-[clamp(2.8rem,5vw,5rem)] font-thebold font-bold text-black uppercase leading-[0.82] tracking-tight m-0 p-0 transition-all duration-300">
+            <h1 className="text-[clamp(2.4rem,4.5vw,5rem)] font-thebold font-bold text-black uppercase leading-[0.85] tracking-tight m-0 p-0 transition-all duration-300">
               {splitWordsEvery2(project.title).map((line, idx) => (
-                <span key={idx} className="block leading-[0.82]">
+                <span key={idx} className="block leading-[0.85]">
                   {line}
                 </span>
               ))}
             </h1>
 
-            <p className="font-neue text-[14px] sm:text-[15px] leading-[1.42] text-black font-normal mt-6 sm:mt-7 max-w-[380px] tracking-tight sm:tracking-normal transition-all duration-300">
+            <p className="font-neue text-[14px] sm:text-[15px] leading-[1.38] md:leading-[1.42] text-black font-normal mt-4 sm:mt-6 max-w-[380px] tracking-tight sm:tracking-normal transition-all duration-300">
               {project.description}
             </p>
 
-            <p className="font-neue text-[11px] sm:text-[12px] font-medium tracking-[0.06em] text-black uppercase mt-5 transition-all duration-300">
+            <p className="font-neue text-[11px] sm:text-[12px] font-medium tracking-[0.06em] text-black uppercase mt-4 sm:mt-5 transition-all duration-300">
               {project.tags}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Bottom Center Toggle CTA: Gallery <-> Index */}
-      <div className="fixed bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+      {/* Bottom Center Toggle CTA: Gallery <-> Index (Desktop only, as mobile has toggle in top bar) */}
+      <div className="hidden md:block fixed bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
         <button
           type="button"
           onClick={() => onToggleView && onToggleView(!isGridView)}
